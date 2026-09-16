@@ -128,7 +128,7 @@ jobs:
               if (target === commenter) {
                 await reply(`@${commenter} I couldn't assign this to you — GitHub rejected the assignment. A maintainer will pick this up shortly.`);
               } else {
-                await reply(`@${commenter} I couldn't assign this to @${target} — GitHub rejected the assignment. This is usually because @${target} hasn't commented on this issue yet; GitHub only accepts assignees who are collaborators or have already participated in the thread. Ask them to comment here first, then try \`/assign @${target}\` again.`);
+                await reply(`@${target}, @${commenter} tried to assign this issue to you, but GitHub didn't apply the assignment. This can happen if you aren't a collaborator and haven't commented on this issue yet. To try taking it yourself, post \`/assign\` on its own line in a new comment here.`);
               }
               return;
             }
