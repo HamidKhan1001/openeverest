@@ -165,6 +165,9 @@ repository ships its own `dev/Tiltfile` that installs a released OpenEverest
 core and then builds and deploys just that provider. For day-to-day provider
 development, use the provider repo's `make dev-up` (see its `dev/README.md`).
 
+See the [provider hub](https://github.com/openeverest/hub/tree/main/extensions/providers)
+for the current list of provider repositories.
+
 ### Testing a provider against a locally built core
 
 When you need a provider to run against the core you are building from source,
