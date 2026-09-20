@@ -208,3 +208,43 @@ echo br_netfilter | sudo tee /etc/modules-load.d/k8s.conf  # persist
 make dev-destroy && make dev-up
 ```
 
+### k3d registry fails to start: "address already in use" on port 5000
+
+`make dev-up` fails during cluster creation with something like:
+
+```
+Error response from daemon: Ports are not available: exposing port TCP 0.0.0.0:5000
+```
+
+Something else on the host already owns port 5000. On macOS this is usually
+Control Center's AirPlay Receiver; confirm with:
+
+```sh
+lsof -nP -iTCP:5000 -sTCP:LISTEN
+```
+
+Pick a free port and change `hostPort` in `dev/k3d_config.dev.yaml` to that
+port instead of `5000`, then run `make dev-up` again.
+
+### `frontend-build` keeps rebuilding itself in a loop
+
+Tilt logs repeat `fsnotify: queue or buffer overflow` and `frontend-build`
+never settles, each run deletes and rebuilds the whole frontend again
+immediately after finishing. Left running, this adds to disk pressure on top
+of the backend build's own large module and build cache, worth ruling out
+if you're seeing `no space left on device` errors during `make dev-up`.
+
+The `frontend-build` resource in `dev/Tiltfile` only ignores
+`ui/apps/*/dist`, `.e2e`, and `.turbo`. The frontend build tooling writes
+other temporary files directly under `ui/apps/everest/` outside of `dist/`,
+so Tilt sees its own build output as a source change and reruns immediately.
+
+If you don't need frontend live-rebuild, set `enableFrontendBuild: false` in
+`dev/config.yaml` (see [Notes for frontend development](#notes-for-frontend-development)).
+If you do, stop the loop and drive it by hand instead:
+
+```sh
+tilt disable frontend-build
+tilt trigger frontend-build   # whenever you actually want a rebuild
+```
+
